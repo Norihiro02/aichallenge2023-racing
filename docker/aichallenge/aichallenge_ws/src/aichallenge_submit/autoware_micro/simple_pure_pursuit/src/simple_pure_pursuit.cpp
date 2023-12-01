@@ -75,6 +75,9 @@ void SimplePurePursuit::onTimer()
     double target_longitudinal_vel =
       use_external_target_vel_ ? external_target_vel_ : closet_traj_point.longitudinal_velocity_mps;
     double current_longitudinal_vel = odometry_->twist.twist.linear.x;
+    
+    target_longitudinal_vel *= 0.7;
+    target_longitudinal_vel = target_longitudinal_vel < 15 ? target_longitudinal_vel : 15;
 
     cmd.longitudinal.speed = target_longitudinal_vel;
     cmd.longitudinal.acceleration =
@@ -105,7 +108,7 @@ void SimplePurePursuit::onTimer()
     double alpha = std::atan2(lookahead_point_y - rear_y, lookahead_point_x - rear_x) -
                    tf2::getYaw(odometry_->pose.pose.orientation);
     cmd.lateral.steering_tire_angle =
-      std::atan2(2.0 * wheel_base_ * std::sin(alpha), lookahead_distance);
+      std::atan2(2.0 * wheel_base_ * std::sin(alpha)*1.25, lookahead_distance);
   }
   pub_cmd_->publish(cmd);
 }
